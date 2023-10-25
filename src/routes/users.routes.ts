@@ -1,9 +1,10 @@
 import { Router } from 'express'
 import { loginValidator, registerValidator } from '~/middlewares/users.middlewares'
 import { loginController, registerController } from '~/controllers/users.controlers'
+import { warpAsync } from '~/utils/handlers'
 const usersRouter = Router()
 
-usersRouter.get('/login', loginValidator, loginController)
+usersRouter.get('/login', loginValidator, warpAsync(loginController))
 
 /*
 Description: register new user
@@ -17,6 +18,6 @@ body: {
     date_of_birth: string the chuaanr ISSO 8601
 }
 */
-usersRouter.post('/register', registerValidator, registerController)
 
+usersRouter.post('/register', registerValidator, warpAsync(registerController))
 export default usersRouter
