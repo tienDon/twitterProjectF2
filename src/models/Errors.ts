@@ -24,6 +24,7 @@ export class ErrorWithStatus {
 }
 
 export class EntityError extends ErrorWithStatus {
+  // entityError dành cho lỗi validate nên mặc định lỗi cho m
   errors: ErrorsType
   //truyển message mặt định
   constructor({ message = USERS_MESSAGES.VALIDATION_ERROR, errors }: { message?: string; errors: ErrorsType }) {

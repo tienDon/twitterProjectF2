@@ -24,6 +24,7 @@ export const loginValidator = validate(
       trim: true,
       custom: {
         options: async (value, { req }) => {
+          // dựa vào email và password tìm đối tượng tương ứng
           //tìm user nào có email và password giống client đưa ko
           const user = await databaseService.users.findOne({
             email: value,
