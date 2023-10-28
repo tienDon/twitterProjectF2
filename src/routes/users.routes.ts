@@ -1,6 +1,11 @@
 import { Router } from 'express'
-import { loginValidator, registerValidator } from '~/middlewares/users.middlewares'
-import { loginController, registerController } from '~/controllers/users.controlers'
+import {
+  accessTokenValidator,
+  loginValidator,
+  refreshtokenValidator,
+  registerValidator
+} from '~/middlewares/users.middlewares'
+import { loginController, logoutController, registerController } from '~/controllers/users.controlers'
 import { warpAsync } from '~/utils/handlers'
 const usersRouter = Router()
 
@@ -20,4 +25,7 @@ body: {
 */
 
 usersRouter.post('/register', registerValidator, warpAsync(registerController))
+
+usersRouter.post('/logout', accessTokenValidator, refreshtokenValidator, warpAsync(logoutController))
+
 export default usersRouter
