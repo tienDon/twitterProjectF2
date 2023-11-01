@@ -1,11 +1,22 @@
 import { Router } from 'express'
 import {
   accessTokenValidator,
+  emailVerifyTokenValidator,
+  forgotPasswordValidator,
   loginValidator,
   refreshtokenValidator,
-  registerValidator
+  registerValidator,
+  verifyForgotPasswordTokenValidator
 } from '~/middlewares/users.middlewares'
-import { loginController, logoutController, registerController } from '~/controllers/users.controlers'
+import {
+  emailVerifyController,
+  forgotPasswordController,
+  loginController,
+  logoutController,
+  registerController,
+  resendemailVerifyController,
+  verifyForgotPasswordTokenController
+} from '~/controllers/users.controlers'
 import { warpAsync } from '~/utils/handlers'
 const usersRouter = Router()
 
@@ -27,5 +38,47 @@ body: {
 usersRouter.post('/register', registerValidator, warpAsync(registerController))
 
 usersRouter.post('/logout', accessTokenValidator, refreshtokenValidator, warpAsync(logoutController))
+
+/*
+des: verify email
+method: post
+path: /users/verify-email
+body: {
+  email_verify_token: string
+}
+*/
+usersRouter.post('/verify-email', emailVerifyTokenValidator, warpAsync(emailVerifyController))
+
+/*
+des: resend verify email
+method: post
+past: /users/resen-verify-email
+headers: {Authorization: "Bearer access_token"}
+*/
+usersRouter.post('/resend-verify-email', accessTokenValidator, warpAsync(resendemailVerifyController))
+
+/*
+des: forgot password
+method: post
+path: /users/forgot-password
+body: {
+  email: string
+}
+*/
+usersRouter.post('/forgot-password', forgotPasswordValidator, warpAsync(forgotPasswordController))
+
+/*
+des: verify forgot password
+method: post
+path: /users/verify-fotgot-password
+body: {
+  forgot_password_token: string
+}
+*/
+usersRouter.post(
+  '/verify-forgot-password',
+  verifyForgotPasswordTokenValidator,
+  warpAsync(verifyForgotPasswordTokenController)
+)
 
 export default usersRouter
