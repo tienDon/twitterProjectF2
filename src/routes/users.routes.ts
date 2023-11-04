@@ -6,21 +6,24 @@ import {
   loginValidator,
   refreshtokenValidator,
   registerValidator,
+  resetPasswordValidator,
   verifyForgotPasswordTokenValidator
 } from '~/middlewares/users.middlewares'
 import {
   emailVerifyController,
   forgotPasswordController,
+  getMeController,
   loginController,
   logoutController,
   registerController,
   resendemailVerifyController,
+  resetPasswordController,
   verifyForgotPasswordTokenController
 } from '~/controllers/users.controlers'
 import { warpAsync } from '~/utils/handlers'
 const usersRouter = Router()
 
-usersRouter.get('/login', loginValidator, warpAsync(loginController))
+usersRouter.post('/login', loginValidator, warpAsync(loginController))
 
 /*
 Description: register new user
@@ -80,5 +83,28 @@ usersRouter.post(
   verifyForgotPasswordTokenValidator,
   warpAsync(verifyForgotPasswordTokenController)
 )
+
+/*
+des: reset password
+path: '/reset-password'
+method: POST
+Header: không cần, vì  ngta quên mật khẩu rồi, thì sao mà đăng nhập để có authen đc
+body: {forgot_password_token: string, password: string, confirm_password: string}
+*/
+usersRouter.post(
+  '/reset-password',
+  resetPasswordValidator,
+  verifyForgotPasswordTokenValidator,
+  warpAsync(resetPasswordController)
+)
+
+/*
+des: get profile của user
+path: '/me'
+method: get
+Header: {Authorization: Bearer <access_token>}
+body: {}
+*/
+usersRouter.get('/me', accessTokenValidator, warpAsync(getMeController))
 
 export default usersRouter

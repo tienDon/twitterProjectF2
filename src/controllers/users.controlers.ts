@@ -3,7 +3,13 @@ import User from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.servies'
 import usersService from '~/services/users.services'
 import { ParamsDictionary } from 'express-serve-static-core'
-import { RegisterReqBody, TokenPayLoad, loginReqBody, logoutReqBody } from '~/models/requests/User.request'
+import {
+  RegisterReqBody,
+  TokenPayLoad,
+  loginReqBody,
+  logoutReqBody,
+  resetPasswordReqBody
+} from '~/models/requests/User.request'
 import { ObjectId } from 'mongodb'
 import { USERS_MESSAGES } from '~/constants/messages'
 import { UserVerifyStatus } from '~/constants/enums'
@@ -91,5 +97,29 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
 export const verifyForgotPasswordTokenController = async (req: Request, res: Response) => {
   return res.json({
     message: USERS_MESSAGES.VERIFY_FORGOT_PASSWORD_TOKEN_SUCCESS
+  })
+}
+
+export const resetPasswordController = async (
+  req: Request<ParamsDictionary, any, resetPasswordReqBody>,
+
+  res: Response
+) => {
+  //muốn cập nhật mật khẩu mới cần có user_id và password mới
+  const { user_id } = req.decoded_forgot_password_token as TokenPayLoad
+  const { password } = req.body
+  //cập nhật password mới cho user có user_id này
+  const result = await usersService.resetPassword({ user_id, password })
+  return res.json(result)
+}
+
+export const getMeController = async (req: Request, res: Response) => {
+  //muốn lấy thông tin của user thì cần user_id
+  const { user_id } = req.decoded_authorization as TokenPayLoad
+  //tiến hành vào databasetimf và lấy thông tin user
+  const user = await usersService.getMe(user_id)
+  return res.json({
+    message: USERS_MESSAGES.GET_ME_SUCCESS,
+    result: user
   })
 }
