@@ -4,8 +4,10 @@ import databaseService from '~/services/database.servies'
 import usersService from '~/services/users.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import {
+  GetProfileReqParams,
   RegisterReqBody,
   TokenPayLoad,
+  UpdateMeReqBody,
   loginReqBody,
   logoutReqBody,
   resetPasswordReqBody
@@ -21,7 +23,10 @@ export const loginController = async (req: Request<ParamsDictionary, any, loginR
   const user = req.user as User
   const user_id = user._id as ObjectId
   //server phải tạo ra access_token và refresh_token để đưa cho client
-  const result = await usersService.login(user_id.toString()) //
+  const result = await usersService.login({
+    user_id: user_id.toString(),
+    verify: user.verify
+  }) //
   return res.json({
     message: USERS_MESSAGES.LOGIN_SUCCESS,
     result
@@ -88,9 +93,9 @@ export const resendemailVerifyController = async (req: Request, res: Response) =
 
 export const forgotPasswordController = async (req: Request, res: Response) => {
   //lấy user_id từ req.user
-  const { _id } = req.user as User
+  const { _id, verify } = req.user as User
   //tiến hành update lại forgot_password_token
-  const result = await usersService.forgotPassword((_id as ObjectId).toString())
+  const result = await usersService.forgotPassword({ user_id: (_id as ObjectId).toString(), verify })
   return res.json(result)
 }
 
@@ -121,5 +126,28 @@ export const getMeController = async (req: Request, res: Response) => {
   return res.json({
     message: USERS_MESSAGES.GET_ME_SUCCESS,
     result: user
+  })
+}
+
+export const updateMeController = async (req: Request<ParamsDictionary, any, UpdateMeReqBody>, res: Response) => {
+  //muốn update thông tin của user thì cần user_id và những thông tin ngta muốn update
+  const { user_id } = req.decoded_authorization as TokenPayLoad
+  const { body } = req
+  //giờ mình sẽ update user thông qua user_id với body dc cho
+  const result = await usersService.updateMe(user_id, body)
+  return res.json({
+    message: USERS_MESSAGES.UPDATE_ME_SUCCESS,
+    result
+  })
+}
+
+export const getProfileController = async (req: Request<GetProfileReqParams>, res: Response) => {
+  //muốn lấy thông tin của user thì cần username
+  const { username } = req.params
+  //tiến hành vào database tìm và lấy thông tin user
+  const user = await usersService.getProfile(username)
+  return res.json({
+    message: USERS_MESSAGES.GET_PROFILE_SUCCESS,
+    user
   })
 }
