@@ -1,12 +1,15 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import User from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.servies'
 import usersService from '~/services/users.services'
 import { ParamsDictionary } from 'express-serve-static-core'
 import {
+  ChangePasswordReqBody,
+  FollowReqBody,
   GetProfileReqParams,
   RegisterReqBody,
   TokenPayLoad,
+  UnfollowReqParams,
   UpdateMeReqBody,
   loginReqBody,
   logoutReqBody,
@@ -150,4 +153,33 @@ export const getProfileController = async (req: Request<GetProfileReqParams>, re
     message: USERS_MESSAGES.GET_PROFILE_SUCCESS,
     user
   })
+}
+
+export const followController = async (
+  req: Request<ParamsDictionary, any, FollowReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayLoad //lấy user_id từ decoded_authorization của access_token
+  const { followed_user_id } = req.body //lấy followed_user_id từ req.body
+  const result = await usersService.follow(user_id, followed_user_id) //chưa có method này
+  return res.json(result)
+}
+
+export const unfollowController = async (req: Request<UnfollowReqParams>, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayLoad //lấy user_id từ decoded_authorization của access_token
+  const { user_id: followed_user_id } = req.params //lấy user_id từ req.params là user_id của người mà ngta muốn unfollow
+  const result = await usersService.unfollow(user_id, followed_user_id) //unfollow chưa làm
+  return res.json(result)
+}
+
+export const changePasswordController = async (
+  req: Request<ParamsDictionary, any, ChangePasswordReqBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayLoad //lấy user_id từ decoded_authorization của access_token
+  const { password } = req.body //lấy old_password và password từ req.body
+  const result = await usersService.changePassword(user_id, password) //chưa code changePassword
+  return res.json(result)
 }

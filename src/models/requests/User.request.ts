@@ -1,5 +1,6 @@
 import { JwtPayload } from 'jsonwebtoken'
 import { UserVerifyStatus } from '~/constants/enums'
+import { ParamsDictionary } from 'express-serve-static-core'
 
 export interface RegisterReqBody {
   name: string
@@ -41,6 +42,22 @@ export interface UpdateMeReqBody {
   cover_photo?: string
 }
 
-export interface GetProfileReqParams {
+export interface FollowReqBody {
+  followed_user_id: string
+}
+
+//cho UnfollowReqParams kế thừa ParamsDictionary
+export interface UnfollowReqParams extends ParamsDictionary {
+  user_id: string
+}
+
+//ta làm luôn cho GetProfileReqParams
+export interface GetProfileReqParams extends ParamsDictionary {
   username: string
+}
+
+export interface ChangePasswordReqBody {
+  old_password: string
+  password: string
+  confirm_password: string
 }
